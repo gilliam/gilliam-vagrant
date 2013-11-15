@@ -18,15 +18,17 @@ sleep 3
 HOST=192.168.33.10
 OPTIONS="-H $HOST:3000"
 
-docker $OPTIONS run -d gilliam/service-registry -n name -c name 
+docker $OPTIONS run -p 3222:3222 -d gilliam/service-registry -n name -c name 
 sleep 3
-docker $OPTIONS run -e GILLIAM_SERVICE_REGISTRY=$HOST:3222 -e DOCKER=http://192.168.33.10:3000 -d gilliam/executor --host $HOST --name vagrant-1
+docker $OPTIONS run -e GILLIAM_SERVICE_REGISTRY=$HOST:3222 -e DOCKER=http://192.168.33.10:3000 -p 9000:9000 -d gilliam/executor --host $HOST --name vagrant-1
+sleep 3
+docker $OPTIONS run -e GILLIAM_SERVICE_REGISTRY=$HOST:3222 -p 9001:80 -d gilliam/proxy bin/proxy -p 80
 sleep 3
 docker $OPTIONS run -e GILLIAM_SERVICE_REGISTRY=$HOST:3222 -e ROUTERS=vagrant-1 gilliam/bootstrap
 sleep 3
 
 pip -q install git+https://github.com/gilliam/gilliam-py.git
-pip -q install git+https://github.com/gilliam/client.git
+pip -q install git+https://github.com/gilliam/gilliam-cli.git
 
 cat > /etc/profile.d/gilliam.sh <<EOF
 export GILLIAM_SERVICE_REGISTRY=$HOST:3222
