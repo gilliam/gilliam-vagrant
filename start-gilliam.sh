@@ -11,7 +11,7 @@ echo "deb http://get.docker.io/ubuntu docker main" > /etc/apt/sources.list.d/doc
 apt-get -qq update
 apt-get -qq install --force-yes lxc-docker > /dev/null
 # XXX: right not we're running over HTTP to support WebSocket.
-sed -i "s#docker -d#docker -d -H 0.0.0.0:3000#g" /etc/init/docker.conf
+sed -i 's#DOCKER_OPTS=#DOCKER_OPTS="-H 0.0.0.0:3000"#g' /etc/init/docker.conf
 service docker restart
 sleep 3
 
